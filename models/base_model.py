@@ -24,16 +24,22 @@ class BaseModel:
         """
 
         if kwargs:
-            if kwargs['self.created_at']:
-                self.created_at= BaseModel.from_string_to_datetime(kwargs['self.created_at'])
-            if kwargs['self.id']:
-                self.id=kwargs['self.id']
-            if kwargs['self.updated_at']:
-                self.updated_at= BaseModel.from_string_to_datetime(kwargs['self.updated_at'])
+            self.id = kwargs.get('id', str(uuid4()))
+            created_at_str = kwargs.get('created_at')
+            if created_at_str:
+                self.created_at = self.from_string_to_datetime(created_at_str)
+            else:
+                self.created_at = datetime.datetime.now()
+            updated_at_str = kwargs.get('updated_at')
+            if updated_at_str:
+                self.updated_at = self.from_string_to_datetime(updated_at_str)
+            else:
+                self.updated_at = self.created_at
         else:
             self.id = str(uuid4())
             self.created_at = datetime.datetime.now()
             self.updated_at = self.created_at
+
     def __str__(self):
         """
         Returns a string representation of the instance.
@@ -80,24 +86,3 @@ class BaseModel:
         format = "%Y-%m-%d %H:%M:%S"
         created_at = datetime.datetime.strptime(datetime_string1, format)
         return created_at
-my_model = BaseModel()
-my_model.name = "My_First_Model"
-my_model.my_number = 89
-print(my_model.id)
-print(my_model)
-print(type(my_model.created_at))
-print("--")
-my_model_json = my_model.to_dict()
-print(my_model_json)
-print("JSON of my_model:")
-for key in my_model_json.keys():
-    print("\t{}: ({}) - {}".format(key, type(my_model_json[key]), my_model_json[key]))
-
-print("--")
-my_new_model = BaseModel(**my_model_json)
-print(my_new_model.id)
-print(my_new_model)
-print(type(my_new_model.created_at))
-
-print("--")
-print(my_model is my_new_model)
